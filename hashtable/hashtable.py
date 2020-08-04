@@ -7,6 +7,94 @@ class HashTableEntry:
         self.value = value
         self.next = None
 
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def search(self, key):
+        current = self.head
+
+        # search for the key that was passed into the method
+        while current is not None:
+            if current.key == key:
+                return current
+
+            current = current.next
+
+        # if the search found nothing, return current which at this
+        # point will always be None
+        return current
+
+    def insert_tail(self, key, value):
+        # if there is no head...
+        if self.head == None:
+            # create a new node
+            new_node = HashTableEntry(key, value)
+            # make the new node the head
+            self.head = new_node
+        # if the head exists...
+        else:
+            # search for the node that matches the key
+            # that was passed in
+            node = self.search(key)
+            
+            # if it found a match
+            if node is not None:
+                # replace the value of that node with the new value
+                node.value = value
+            # if the key does not exist in the linked list...
+            else:
+                # create a new node
+                new_node = HashTableEntry(key, value)
+                # set a current variable to iterate
+                current = self.head
+                # itereate through current to find the tail
+                while current.next is not None:
+                    current = current.next
+                # set the tails next node 
+                current.next = new_node
+
+
+    def delete(self, key):
+        # set the current to iterate
+        current = self.head
+        # if the next value after current is None,
+        # then that means the only node is the head.
+        # remove the head
+        if current.next is None:
+            self.head = None
+        # if the current key is the key passed in,
+        # set the new head as the current's next node
+        elif current.key == key:
+            self.head = current.next
+        # if there is a next node and the key does not
+        # match the head...
+        else:
+            # iterate through the linked list
+            while current.next is not None:
+                # if the next node's key is the passed in key
+                if current.next.key == key:
+                    # set the current next node to None
+                    current.next = None
+                # if the current next's key is not the key we are looking for,
+                # keep iterating
+                else:
+                    current = current.next
+
+    def size(self):
+        current = self.head
+        size = 0
+        if current.next is None:
+            return 1
+        else:
+            while current is not None:
+                size += 1
+                current = current.next
+
+            return size
+
+    
+
 
 # Hash table can't have fewer than this many slots
 MIN_CAPACITY = 8
@@ -44,8 +132,14 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        total_elements = 0
+        for i in self.table:
+            if i is None:
+                pass
+            else:
+                total_elements += i.size()
 
+        return total_elements / self.get_num_slots()
 
     def fnv1(self, key):
         """
@@ -87,10 +181,32 @@ class HashTable:
 
         Implement this.
         """
+        # get the hash index
         hash_index = self.hash_index(key)
 
-        self.table[hash_index] = value
+        # if the hash index is None...
+        if self.table[hash_index] is None:
+            # create a linkedlist object
+            self.table[hash_index] = LinkedList()
+            # insert the node to the tail of the linked list
+            # since it won't find a head, it will set this
+            # as the head
+            self.table[hash_index].insert_tail(key, value)
+        # if a linked list already exists
+        else:
+            # add a node to the tail
+            self.table[hash_index].insert_tail(key, value)
 
+        load_factor = self.get_load_factor()
+
+        if load_factor >= 0.7:
+            self.resize(self.get_num_slots() * 2)
+
+        elif load_factor <= 0.2:
+            new_capacity = self.get_num_slots() // 2
+            if new_capacity < 8:
+                new_capacity = 8
+            self.resize(new_capacity)
 
 
     def delete(self, key):
@@ -101,11 +217,22 @@ class HashTable:
 
         Implement this.
         """
+        # get the hash index
         hash_index = self.hash_index(key)
-        if hash_index < self.get_num_slots():
-            self.table[hash_index] = None
+        
+        # if there is no linked list at the index
+        if self.table[hash_index] == None:
+            # return
+            return print("The key had no value")
+        # if there is a linked list at the index...
         else:
-            print('key is not found')
+            # delete the node
+            self.table[hash_index].delete(key)
+
+            # if the head was deleted...
+            if self.table[hash_index].head is None:
+                # a linked list is not needed, set the index to None
+                self.table[hash_index] = None
 
 
     def get(self, key):
@@ -116,11 +243,26 @@ class HashTable:
 
         Implement this.
         """
+        # get the hash index
         hash_index = self.hash_index(key)
-        if hash_index < self.get_num_slots():
-            return self.table[hash_index]
-        else:
+        # if there is no linked list at a the index...
+        if self.table[hash_index] is None:
+            # return None
             return None
+
+        # if there is a linked list at the index,
+        # search for the key at that linked list
+        node = self.table[hash_index].search(key)
+
+        # if it found a match...
+        if node is not None:
+            # return the value
+            return node.value
+
+        # if it didn't find a match
+        else:
+            # return None since search() returns None if nothing is found
+            return node
 
 
     def resize(self, new_capacity):
@@ -130,7 +272,18 @@ class HashTable:
 
         Implement this.
         """
-        # Your code here
+        new_array = [None] * new_capacity
+
+        self.capacity = new_capacity
+
+        for i in self.table:
+            if i is None:
+                pass
+            else:
+                hash_index = self.hash_index(i.head.key)
+                new_array[hash_index] = i
+
+        self.table = new_array
 
 
 

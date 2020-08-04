@@ -99,3 +99,37 @@ hashed_string = my_hash("hello")
 our_index = hashed_string % len(new_list)
 
 print(new_list[our_index])
+
+
+# How to handle collisions?
+## Linked lists! Put a chain there
+## Open adressing: linear probing
+
+# an array full of nodes
+## node properties: key, value, next
+
+# Index     List value
+# 0         Node("barn", "moo cow") --> Node("howdy", "howdy world") --> None
+# 1         None
+# 2         None
+# 3         None
+# 4         Node("hello", "hello world") --> None
+
+# put("howdy", "howdy world") # index 0 --> collision
+
+
+# [Node("moo cow"), None, None, None, Node("Hello world"), None]
+
+# put with no collision: add a node, start of LL
+# put with a collision: add a node to head or tail of the LL
+
+# get("howdy")
+## hash the key, modulo to get index, go to index
+## compare with the original key
+# if key matches, return value
+
+# get("super") # hashes/modulo to index 4
+# compare with the original key
+# if key matches, return value
+# go down LL until match is found
+# if not found, return none
