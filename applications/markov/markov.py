@@ -25,8 +25,12 @@ for i in (words):
 
 for _ in range(5):
     num_words = 15
+    start_word = True
+    while start_word:
+        first_word = random.choice(list(word_dict.keys()))
+        if first_word[0] == first_word[0].upper() or first_word[0] == '"':
+            start_word = False
 
-    first_word = random.choice(list(word_dict.keys()))
 
     sentence = first_word
 
@@ -44,6 +48,15 @@ for _ in range(5):
         sentence = sentence + f" {random_word}"
 
         num_words -= 1
+
+        if num_words == 1:
+            last_word_check = True
+            while last_word_check:
+                last_word = random.choice(list(word_dict.keys()))
+                if last_word[-1] in ['.','?','!','"']:
+                    sentence = sentence + f" {last_word}"
+                    last_word_check = False
+                    num_words -= 1
 
     print(f"Sentence: {_ + 1}")
     print(sentence, '\n')
