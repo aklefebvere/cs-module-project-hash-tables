@@ -1,7 +1,20 @@
 def no_dups(s):
-    # Your code here
+    dupe_dict = {}
+    if s == "":
+        return ""
 
+    s = s.split(" ")
 
+    for i in s:
+        if i not in dupe_dict:
+            dupe_dict[i] = i
+
+    dupe_list = list(dupe_dict.keys())
+
+    s = " ".join(dupe_list)
+
+    return s
+    
 
 if __name__ == "__main__":
     print(no_dups(""))

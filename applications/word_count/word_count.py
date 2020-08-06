@@ -1,6 +1,25 @@
+symb = ['"', ":", ";", ",", ".", "-", "+", "=", "/", "\\" "|", "[", "]", "{", "}", "(", ")", "*", "^", "&", "\r", "\n", "\t"]
 def word_count(s):
-    # Your code here
+    count_dict  = {}
+    for i in symb:
+        s = s.replace(i, " ")
 
+    if len(s) == 0:
+        return {}
+    
+    s = s.lower()
+
+    s = s.split(" ")
+
+    for i in s:
+        if i == '':
+            pass
+        elif i in count_dict:
+            count_dict[i] += 1
+        else:
+            count_dict[i] = 1
+
+    return count_dict
 
 
 if __name__ == "__main__":
